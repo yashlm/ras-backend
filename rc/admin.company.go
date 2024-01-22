@@ -3,7 +3,6 @@ package rc
 import (
 	"net/http"
 	"strconv"
-	"log"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/spo-iitk/ras-backend/middleware"
@@ -138,25 +137,6 @@ func deleteCompanyHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "Company Deleted from this RC"})
 }
 
-// func getCompanyHistoryHandler(ctx *gin.Context) {
-// 	var companyHistory []CompanyHistory
-
-// 	cid, err := strconv.ParseUint(ctx.Param("cid"), 10, 32)
-// 	if err != nil {
-// 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// 		return
-// 	}
-
-// 	err = getCompanyHistory(ctx, uint(cid), &companyHistory)
-
-// 	if err != nil {
-// 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// 		return
-// 	}
-
-// 	ctx.JSON(http.StatusOK, companyHistory)
-// }
-
 func getCompanyHistoryHandler(ctx *gin.Context) {
     var companyHistory []CompanyHistory
     cid, err := strconv.ParseUint(ctx.Param("cid"), 10, 32)
@@ -164,9 +144,6 @@ func getCompanyHistoryHandler(ctx *gin.Context) {
         ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
-
-    log.Println("Received request for company history with cid:", cid)
-	log.Println("Request URL:", ctx.Request.URL.String())
 
     err = getCompanyHistory(ctx, uint(cid), &companyHistory)
     if err != nil {
