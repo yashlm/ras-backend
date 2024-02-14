@@ -15,43 +15,19 @@ type Mail struct {
 	Body    string
 }
 
-// func (mail *Mail) BuildMessage() []byte {
-// 	message := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\r\n"
-// 	message += fmt.Sprintf("From: Recruitment Automation System IITK<%s>\r\n", sender)
-// 	message += fmt.Sprintf("Subject: %s | Recruitment Automation System\r\n", mail.Subject)
-
-// 	// If mass mailing, BCC all the users
-// 	if len(mail.To) == 1 {
-// 		message += fmt.Sprintf("To: %s\r\n\r\n", mail.To[0])
-// 	} else {
-// 		message += fmt.Sprintf("To: Undisclosed Recipients<%s>\r\n\r\n", webteam)
-// 	}
-
-// 	message += strings.Replace(mail.Body, "\n", "<br>", -1)
-// 	message += "<br><br>--<br>Recruitment Automation Sysytem<br>"
-// 	message += "Indian Institute of Technology Kanpur<br><br>"
-// 	message += "<small>This is an auto-generated email. Please do not reply.</small>"
-
-// 	return []byte(message)
-// }
-
 func (mail *Mail) BuildMessage() []byte {
+
 	type TemplateData struct {
 		To      []string
 		Subject string
 		Body    string
 	}
 
-	templateData := TemplateData{
-		To:      mail.To,
-		Subject: mail.Subject,
-		Body:    mail.Body,
-	}
-
-	
 	var message strings.Builder
 
-	msg := message.String()
+	msg := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\r\n"
+	msg += fmt.Sprintf("From: Recruitment Automation System IITK<%s>\r\n", sender)
+	msg += fmt.Sprintf("Subject: %s\r\n", mail.Subject)
 
 	// If mass mailing, BCC all the users
 	if len(mail.To) == 1 {
@@ -59,15 +35,20 @@ func (mail *Mail) BuildMessage() []byte {
 	} else {
 		msg += fmt.Sprintf("To: Undisclosed Recipients<%s>\r\n\r\n", webteam)
 	}
-	
+
+	message.WriteString(msg)
+
 	tmpl := template.Must(template.New("Template").Parse(DefaultTemplate))
-	err := tmpl.Execute(&message, templateData)
+	err := tmpl.Execute(&message, TemplateData{
+		Subject: mail.Subject,
+		Body:    mail.Body,
+	})
 	if err != nil {
 		logrus.Errorf("Error executing email template: %v", err)
 		return nil
 	}
 
-	return []byte(msg)
+	return []byte(message.String())
 }
 
 func batchEmails(to []string, batch int) [][]string {
